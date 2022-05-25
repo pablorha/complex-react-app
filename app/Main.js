@@ -1,10 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useReducer } from 'react'
 import { createRoot } from 'react-dom/client'
 const container = document.getElementById('app')
 const root = createRoot(container)
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Axios from 'axios'
 Axios.defaults.baseURL = 'http://localhost:8080'
+
+import StateContext from './StateContext'
+import DispatchContext from './DispatchContext'
 
 // My Components
 import Header from './components/Header'
@@ -15,21 +18,43 @@ import About from './components/About'
 import Terms from './components/Terms'
 import CreatePost from './components/CreatePost'
 import ViewSinglePost from './components/ViewSinglePost'
+import FlashMessages from './components/FlashMessages'
 
 function Main() {
-	const [loggedIn, setLoggedIn] = useState(Boolean(localStorage.getItem('complexappToken')))
+	const initialState = {
+		loggedIn: Boolean(localStorage.getItem('complexappToken')),
+		flashMessages: [],
+	}
+
+	function ourReducer(state, action) {
+		switch (action.type) {
+			case 'login':
+				return { loggedIn: true, flashMessages: state.flashMessages }
+			case 'logout':
+				return { loggedIn: false, flashMessages: state.flashMessages }
+			case 'flashMessage':
+				return { loggedIn: state.loggedIn, flashMessages: state.flashMessages.concat(action.value) }
+		}
+	}
+	const [state, dispatch] = useReducer(ourReducer, initialState)
+
 	return (
-		<Router>
-			<Header loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
-			<Routes>
-				<Route path='/' element={loggedIn ? <Home /> : <HomeGuest />} />
-				<Route path='/about-us' element={<About />} />
-				<Route path='/terms' element={<Terms />} />
-				<Route path='/create-post' element={<CreatePost />} />
-				<Route path='/post/:id' element={<ViewSinglePost />} />
-			</Routes>
-			<Footer />
-		</Router>
+		<StateContext.Provider value={state}>
+			<DispatchContext.Provider value={dispatch}>
+				<Router>
+					<FlashMessages messages={state.flashMessages} />
+					<Header />
+					<Routes>
+						<Route path='/' element={state.loggedIn ? <Home /> : <HomeGuest />} />
+						<Route path='/about-us' element={<About />} />
+						<Route path='/terms' element={<Terms />} />
+						<Route path='/create-post' element={<CreatePost />} />
+						<Route path='/post/:id' element={<ViewSinglePost />} />
+					</Routes>
+					<Footer />
+				</Router>
+			</DispatchContext.Provider>
+		</StateContext.Provider>
 	)
 }
 
