@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import Page from './Page'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import Axios from 'axios'
 import LoadinDotsIcon from './LoadinDotsIcon'
 import ReactMarkdown from 'react-markdown'
 import ReactTooltip from 'react-tooltip'
+import NotFound from './NotFound'
 
 function ViewSinglePost() {
 	const { id } = useParams()
 	const [isLoading, setIsLoading] = useState(true)
 	const [post, setPost] = useState()
+
+	const navigate = useNavigate()
 
 	useEffect(() => {
 		const ourRequest = Axios.CancelToken.source()
@@ -29,6 +32,10 @@ function ViewSinglePost() {
 		}
 	}, [])
 
+	if (!isLoading && !post) {
+		return <NotFound />
+	}
+
 	if (isLoading)
 		return (
 			<Page title='...'>
@@ -44,9 +51,9 @@ function ViewSinglePost() {
 			<div className='d-flex justify-content-between'>
 				<h2>{post.title}</h2>
 				<span className='pt-2'>
-					<a href='#' data-tip='Edit' data-for='edit' className='text-primary mr-2'>
+					<Link to={`/post/${post._id}/edit`} data-tip='Edit' data-for='edit' className='text-primary mr-2'>
 						<i className='fas fa-edit'></i>
-					</a>
+					</Link>
 					<ReactTooltip id='edit' className='custom-tooltip' />
 					<a data-tip='Delete' data-for='delete' className='delete-post-button text-danger'>
 						<i className='fas fa-trash'></i>

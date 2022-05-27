@@ -19,6 +19,8 @@ import CreatePost from './components/CreatePost'
 import ViewSinglePost from './components/ViewSinglePost'
 import FlashMessages from './components/FlashMessages'
 import Profile from './components/Profile'
+import EditPost from './components/EditPost'
+import NotFound from './components/NotFound'
 
 const container = document.getElementById('app')
 const root = createRoot(container)
@@ -74,7 +76,9 @@ function Main() {
 						<Route path='/about-us' element={<About />} />
 						<Route path='/terms' element={<Terms />} />
 						<Route path='/create-post' element={<CreatePost />} />
-						<Route path='/post/:id' element={<ViewSinglePost />} />
+						<Route path='/post/:id' exact element={<ViewSinglePost />} />
+						<Route path='/post/:id/edit' exact element={<EditPost />} />
+						<Route path='*' element={<NotFound />} />
 					</Routes>
 					<Footer />
 				</Router>
