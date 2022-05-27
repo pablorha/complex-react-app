@@ -2,6 +2,7 @@ import React, { useState, useReducer, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { useImmerReducer } from 'use-immer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { CSSTransition } from 'react-transition-group'
 import Axios from 'axios'
 Axios.defaults.baseURL = 'http://localhost:8080'
 
@@ -88,7 +89,9 @@ function Main() {
 						<Route path='/post/:id/edit' exact element={<EditPost />} />
 						<Route path='*' element={<NotFound />} />
 					</Routes>
-					{state.isSearchOpen ? <Search /> : ''}
+					<CSSTransition timeout={330} in={state.isSearchOpen} classNames='search-overlay' unmountOnExit>
+						<Search />
+					</CSSTransition>
 					<Footer />
 				</Router>
 			</DispatchContext.Provider>
